@@ -1,1 +1,12 @@
-This directory is intentionally left blank.
+import shutil
+
+# Source path of the image
+source = r"C:\Users\PC\Documents\Site Files (Backup + testing)\WebsiteFiles-main\assets\images\jaeger.jpg"
+
+# Destination path
+destination = r"C:\Users\PC\Downloads\me.jpg"
+
+# Copy the file
+shutil.copy(source, destination)
+
+print("File copied successfully!")
