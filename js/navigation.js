@@ -23,6 +23,66 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     `;
 
+    // Performance optimized navigation
+    const navLinks = document.querySelectorAll('.nav-link');
+    const themeToggle = document.querySelector('.theme-toggle');
+    const body = document.body;
+    
+    // Use Intersection Observer for scroll animations
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-in');
+                observer.unobserve(entry.target); // Optimize by unobserving after animation
+            }
+        });
+    }, {
+        threshold: 0.1,
+        rootMargin: '50px'
+    });
+
+    // Observe elements with animation class
+    document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+
+    // Debounced scroll handler
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+        if (!scrollTimeout) {
+            window.requestAnimationFrame(() => {
+                handleScroll();
+                scrollTimeout = null;
+            });
+            scrollTimeout = true;
+        }
+    });
+
+    // Optimized theme toggle
+    const theme = localStorage.getItem('theme') || 'dark';
+    body.classList.toggle('dark-theme', theme === 'dark');
+    themeToggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+
+    themeToggle.addEventListener('click', () => {
+        body.classList.toggle('dark-theme');
+        const isDark = body.classList.contains('dark-theme');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        themeToggle.textContent = isDark ? '🌙' : '☀️';
+    });
+
+    // Link click handler with preloading
+    navLinks.forEach(link => {
+        link.addEventListener('mouseenter', () => {
+            const href = link.getAttribute('href');
+            if (href && !link.dataset.preloaded) {
+                const preloadLink = document.createElement('link');
+                preloadLink.rel = 'preload';
+                preloadLink.as = 'document';
+                preloadLink.href = href;
+                document.head.appendChild(preloadLink);
+                link.dataset.preloaded = 'true';
+            }
+        });
+    });
+
     // Handle navigation clicks
     document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', (e) => {
@@ -30,13 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const path = link.getAttribute('href');
             navigateTo(path);
         });
-    });
-
-    // Theme toggle functionality
-    const themeToggle = document.querySelector('.theme-toggle');
-    themeToggle.addEventListener('click', () => {
-        document.body.classList.toggle('dark-theme');
-        themeToggle.textContent = document.body.classList.contains('dark-theme') ? '🌙' : '☀️';
     });
 
     // Handle browser navigation
@@ -68,3 +121,12 @@ document.addEventListener('DOMContentLoaded', () => {
         loadContent(currentPath);
     }
 });
+
+// Scroll performance optimization
+function handleScroll() {
+    const scrolled = window.pageYOffset;
+    const nav = document.querySelector('.main-nav');
+    nav.style.background = scrolled > 50 
+        ? 'rgba(15, 23, 42, 0.9)' 
+        : 'rgba(15, 23, 42, 0.7)';
+}
