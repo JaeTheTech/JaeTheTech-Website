@@ -1,0 +1,6 @@
+title: JaeTheTech
+baseurl: ""
+url: "https://jaethetech.github.io"
+permalink: pretty
+include: [".well-known", "_pages"]
+exclude: ["node_modules", "README.md"]
